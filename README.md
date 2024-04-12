@@ -12,3 +12,4 @@ Project guidelines For the completion of this project, you'll have to complete t
 Note: This platform is not persistent. It is recommended that you keep a copy of your code on your local machines and save changes from time to time. In case you revisit the lab, you will need to recreate the files in this lab environment, using the saved copies from your machines.
 
 Tasks and objectives: Task 1: Clone the project repository Task 2: Create an emotion detection application using Watson NLP library Task 3: Format the output of the application Task 4: Package the application Task 5: Run Unit tests on your application Task 6: Deploy as web application using Flask Task 7: Incorporate Error handling Task 8: Run static code analysis Let's get started!
+Using Watson AI NLP Libraries
