@@ -1,38 +1,50 @@
-import json
-import requests
+
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_watson.natural_language_understanding_v1 import Features, EmotionOptions
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
 def emotion_detector(text_to_analyze):
     '''
     Function that analyzes text and returns a dictionary containing the required set of emotions with their scores,
     along with the dominant emotion.
     '''
+
     if not text_to_analyze:
         # Handle blank entries
         return {'anger': None, 'disgust': None, 'fear': None, 'joy': None, 'sadness': None, 'dominant_emotion': None}
-    
-    URL = 'https://sn-watson-emotion.labs.skills.network/v1/watson.runtime.nlp.v1/NlpService/EmotionPredict'
-    Headers = {"grpc-metadata-mm-model-id": "emotion_aggregated-workflow_lang_en_stock"}
-    Input = {"raw_document": {"text": text_to_analyze}}
-    response = requests.post(URL, json=Input, headers=Headers)
-    
-    if response.status_code == 400:
-        # Handle HTTP 400 error
-        return {'anger': None, 'disgust': None, 'fear': None, 'joy': None, 'sadness': None, 'dominant_emotion': None}
-    
+
+    # Use your API key and service URL from the credentials
+    api_key = 'QAmaBGAJ7ook3UueHHQSy0UEqgoougTcR_c8U88D6KbM'
+    url = 'https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/75cc7845-fe8c-4877-81e3-f5bcd467b69e'
+
+    # Set up the authenticator
+    authenticator = IAMAuthenticator(api_key)
+    nlu = NaturalLanguageUnderstandingV1(
+        version='2021-08-01',
+        authenticator=authenticator
+    )
+
+    # Set the service URL
+    nlu.set_service_url(url)
+
+    # Analyze the emotions in the text
     try:
-        formated_response = json.loads(response.text)
-        # Extracting the emotion scores
-        emotion_scores = formated_response['emotionPredictions'][0]['emotion']
-        # Required set of emotions
+        response = nlu.analyze(
+            text=text_to_analyze,
+            features=Features(emotion=EmotionOptions())
+        ).get_result()
+
+        # Extracting emotion scores
+        emotion_scores = response['emotion']['document']['emotion']
         required_emotions = ['anger', 'disgust', 'fear', 'joy', 'sadness']
-        # Finding dominant emotion
         dominant_emotion = max(emotion_scores, key=emotion_scores.get)
-        # Construct the dictionary containing the required set of emotions along with their scores
+
         result = {emotion: emotion_scores.get(emotion, 0) for emotion in required_emotions}
-        # Add the dominant emotion to the result dictionary
         result['dominant_emotion'] = dominant_emotion
+
         return result
+
     except Exception as e:
-        # Handle any other errors
         print(f"Error: {e}")
         return {'anger': None, 'disgust': None, 'fear': None, 'joy': None, 'sadness': None, 'dominant_emotion': None}
+
