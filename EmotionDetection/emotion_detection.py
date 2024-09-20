@@ -1,50 +1,36 @@
+"""
+# EmotionDetection/emotion_detection.py
+#from clients.ibm_emotion_detector import IBEmotionDetector
+from EmotionDetection.clients.ibm_emotion_detector import IBEmotionDetector
 
-from ibm_watson import NaturalLanguageUnderstandingV1
-from ibm_watson.natural_language_understanding_v1 import Features, EmotionOptions
-from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
-def emotion_detector(text_to_analyze):
-    '''
-    Function that analyzes text and returns a dictionary containing the required set of emotions with their scores,
-    along with the dominant emotion.
-    '''
+# Initialize the detector with your API credentials
+api_key = 'QAmaBGAJ7ook3UueHHQSy0UEqgoougTcR_c8U88D6KbM'
+url = 'https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/75cc7845-fe8c-4877-81e3-f5bcd467b69e'
 
-    if not text_to_analyze:
-        # Handle blank entries
-        return {'anger': None, 'disgust': None, 'fear': None, 'joy': None, 'sadness': None, 'dominant_emotion': None}
+detector = IBEmotionDetector(api_key, url)
 
-    # Use your API key and service URL from the credentials
-    api_key = 'QAmaBGAJ7ook3UueHHQSy0UEqgoougTcR_c8U88D6KbM'
-    url = 'https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/75cc7845-fe8c-4877-81e3-f5bcd467b69e'
+# Example usage
+text = "I am feeling great!"
+result = detector.detect_emotion(text)
+print(result)
+"""
+import os
+from dotenv import load_dotenv
+from EmotionDetection.clients.ibm_emotion_detector import IBEmotionDetector
 
-    # Set up the authenticator
-    authenticator = IAMAuthenticator(api_key)
-    nlu = NaturalLanguageUnderstandingV1(
-        version='2021-08-01',
-        authenticator=authenticator
-    )
+# Load environment variables from .env file
+load_dotenv()
 
-    # Set the service URL
-    nlu.set_service_url(url)
+# Initialize the detector with your API credentials from the .env file
+api_key = os.getenv('IBM_API_KEY')
+url = os.getenv('IBM_SERVICE_URL')
 
-    # Analyze the emotions in the text
-    try:
-        response = nlu.analyze(
-            text=text_to_analyze,
-            features=Features(emotion=EmotionOptions())
-        ).get_result()
+detector = IBEmotionDetector(api_key, url)
 
-        # Extracting emotion scores
-        emotion_scores = response['emotion']['document']['emotion']
-        required_emotions = ['anger', 'disgust', 'fear', 'joy', 'sadness']
-        dominant_emotion = max(emotion_scores, key=emotion_scores.get)
+# Example usage
+text = "I am feeling great!"
+result = detector.detect_emotion(text)
+print(result)
 
-        result = {emotion: emotion_scores.get(emotion, 0) for emotion in required_emotions}
-        result['dominant_emotion'] = dominant_emotion
-
-        return result
-
-    except Exception as e:
-        print(f"Error: {e}")
-        return {'anger': None, 'disgust': None, 'fear': None, 'joy': None, 'sadness': None, 'dominant_emotion': None}
 
