@@ -1,8 +1,17 @@
 
+from dotenv import load_dotenv
+import os
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_watson.natural_language_understanding_v1 import Features, EmotionOptions
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Get API key and URL from the environment variables
+api_key = os.getenv('IBM_API_KEY')
+url = os.getenv('IBM_SERVICE_URL')
 def emotion_detector(text_to_analyze):
     '''
     Function that analyzes text and returns a dictionary containing the required set of emotions with their scores,
@@ -12,10 +21,6 @@ def emotion_detector(text_to_analyze):
     if not text_to_analyze:
         # Handle blank entries
         return {'anger': None, 'disgust': None, 'fear': None, 'joy': None, 'sadness': None, 'dominant_emotion': None}
-
-    # Use your API key and service URL from the credentials
-    api_key = 'QAmaBGAJ7ook3UueHHQSy0UEqgoougTcR_c8U88D6KbM'
-    url = 'https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/75cc7845-fe8c-4877-81e3-f5bcd467b69e'
 
     # Set up the authenticator
     authenticator = IAMAuthenticator(api_key)
